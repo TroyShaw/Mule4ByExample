@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DwSelectorDotOverObject" doc:id="3eae23b7-1dc0-443b-94ed-6824cafc5c91" >
+		<http:listener doc:name="Listener" doc:id="5235a478-0a47-49c9-b1d0-8b0f010f8126" config-ref="HTTP_Listener_config" path="dwSelectorDotOverObject"/>
+		<set-payload value='#[
+{
+  "people": {
+    "size" : 1,
+    "person": {
+      "name": "Nial",
+      "address": {
+        "street": {
+          "name": "Italia",
+          "number": 2164
+        },
+        "area": {
+          "zone": "San Isidro",
+          "name": "Martinez"
+        }
+      }
+    }
+  }
+}
+]' doc:name="Set Payload" doc:id="7329f799-fc48-4f3c-83ed-993f1151ca31" />
+		<ee:transform doc:name="Transform Message" doc:id="618ea829-afdd-49bc-bde5-7b11135683e3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  address: payload.people.person.address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DwSelectorDotOverArray" doc:id="1e883f04-9541-4033-bc05-9d19f98202d0" >
+		<http:listener doc:name="Listener" doc:id="a6c66af5-0a87-4c1c-95d2-dd791ca2e89a" config-ref="HTTP_Listener_config" path="dwSelectorDotOverArray" />
+		<ee:transform doc:name="Transform Message" doc:id="2cdbc38d-5ce7-4efd-a1d8-b2bff59836fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_DwSelectorDotOverArray" doc:id="acdce64f-12dc-4bd8-9c9e-d4e1ba7c8c7c" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="ec9b6ab7-4998-4e06-b131-71bcb7304d72" config-ref="HTTP_Listener_config" path="dwSelectorDotOverArray2" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="3fb5ab49-184a-42a8-afe6-cd21ca5b9156" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

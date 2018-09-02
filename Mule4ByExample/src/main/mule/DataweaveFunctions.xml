@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="DataweaveFunctionsFlow" doc:id="871f447b-ae4c-4b10-9001-c28e348488e2" >
+		<http:listener doc:name="Listener" doc:id="256ad1c1-ac0a-4275-a112-956bf4453d0a" config-ref="HTTP_Listener_config" path="/dwFunction1"/>
+		<ee:transform doc:name="Transform Message" doc:id="19ad3dad-f715-403c-a110-2b53a16bac5d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+import dw::core::Strings
+import dataweave::MyLib
+
+output application/json
+---
+{
+	"input": Strings::capitalize(payload),
+	"enhanced": MyLib::myFunction('goodInput')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="OutputPayload" doc:id="36861fe8-5b4d-4a9d-8dcb-c78b6f26e1f0" >
+		<http:listener doc:name="Listener" doc:id="4f30e57c-13ca-406b-a75f-659f3bbdcb34" config-ref="HTTP_Listener_config" path="/transform1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="384ccf32-2c0f-497c-ac6a-b4ac59aecdda" />
+		<ee:transform doc:name="Transform Message" doc:id="b30a8d5e-11f4-4f51-9ab0-1a7859375d53" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="SimpleSingleMapping" doc:id="20f8560b-0e3d-4f54-84c5-650905232b2b" >
+		<http:listener doc:name="Listener" doc:id="83d8b4b2-3080-4316-9fe1-22222531e543" config-ref="HTTP_Listener_config" path="/transform2" />
+		<logger level="INFO" doc:name="Logger" doc:id="c069de9b-494d-4438-8a72-327a86d94d21" />
+		<ee:transform doc:name="Transform Message" doc:id="8fdc85f3-c0f2-49ed-8e28-88ef45d9c72f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+myUser: {
+	userName: payload.User.Name,
+	printname: "User's name is $(payload.User.Name)"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="SimpleArrayMappingWithMap" doc:id="b9252f95-187b-4fc4-8584-efed2a854be2" >
+		<http:listener doc:name="Listener" doc:id="f95c1176-907a-41f5-9d57-5531c3f35ef9" config-ref="HTTP_Listener_config" path="/transform3" />
+		<ee:transform doc:name="Transform Message" doc:id="5b60324d-8162-4d55-a20f-82c4be8fd211" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+users: payload.order.*product map {
+	jsonPrice: $.price as Number,
+	jsonModel: $.model
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="SimpleArrayMappingWith$" doc:id="99a80bee-7976-48c3-a385-df5dc997e254" >
+		<http:listener doc:name="Listener" doc:id="3a7332ef-4f3f-4fb1-b270-9e6eccd31c8d" config-ref="HTTP_Listener_config" path="/transform4" />
+		<ee:transform doc:name="Transform Message" doc:id="9cda1e12-3377-4828-bdc5-91f9e9dee5a2" >
+			<ee:message >
+				<ee:set-payload resource="dataweave/basicMapping.dwl" />
+				<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-attributes>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="testVar" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<flow name="MappingToCSV" doc:id="68a2327e-591c-46a6-9e01-bcbb6f864f10" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="b8897a10-41c8-4579-8a4d-9764aa602aa5" config-ref="HTTP_Listener_config" path="/transform5" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="aa96735a-4a4d-4105-910a-75f250d8a712" >
+			<ee:message >
+				<ee:set-payload resource="dataweave/basicMapping.dwl" />
+				<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-attributes>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="testVar" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<flow name="MappingToXMLComplex1" doc:id="b1e6cc33-446c-4151-82c3-a474d4e825cc" >
+		<http:listener doc:name="Copy_of_Copy_of_Listener" doc:id="8f2d6440-12cc-45af-825a-e42edb681d9a" config-ref="HTTP_Listener_config" path="/transform6" />
+		<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="5588568b-bbb5-4177-b8d4-5d2aab4fe58a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+Users: { 
+	User: payload map {
+		FirstName: $.firstname,
+		LastName: $.lastname,
+		Index: $$
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<flow name="MappingToXMLComplex2" doc:id="6f2b916c-d405-4148-8249-06540dfd8190" >
+		<http:listener doc:name="Copy_of_Copy_of_Copy_of_Listener" doc:id="6e554ed2-91b0-4b47-8141-d0537b268462" config-ref="HTTP_Listener_config" path="/transform7" />
+		<ee:transform doc:name="Transform Message" doc:id="391454c3-b5dd-4ff8-8318-202a18c0abee" >
+			<ee:message>
+				<ee:set-payload resource="dataweave/basicMapping.dwl" />
+				<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-attributes>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="testVar" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
+</mule>

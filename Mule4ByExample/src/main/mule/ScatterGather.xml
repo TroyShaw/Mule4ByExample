@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="ScatterGatherFlattenResults1" doc:id="c3691ae8-aaf5-49f9-9a60-dc9670fd381f" >
+		<http:listener doc:name="Listener" doc:id="c489833b-1f25-4b97-8e5c-bb69bad7e258" config-ref="HTTP_Listener_config" path="/scatterGather1"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="16a14bdc-9742-478d-b61a-a8f566b80b3a" >
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="3ed12c17-459f-47be-b641-b2cca3251ef1" name="ScatterGatherSub_input1"/>
+			</route>
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="e4f1577d-1953-476f-824a-75b985973429" name="ScatterGatherSub_input1"/>
+			</route>
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="1a44cbad-bcd1-45cd-85be-3bda284f0336" name="ScatterGatherSub_input1"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="ae8266b4-4530-4ae4-9c18-d7daa4c39b59" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	users: [
+		payload[0].payload,
+		payload[1].payload,
+		payload[2].payload
+		]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="ScatterGatherSub_input1" doc:id="2893601c-fcce-4013-9634-d9c2262ba068" >
+		<ee:transform doc:name="Transform Message" doc:id="c31d05b1-c535-4550-8a65-4792ab15f6d1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	name: "John Smith",
+	age: 34
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<flow name="ScatterGatherFlattenResults2" doc:id="69abea24-7716-4fe6-9a6e-c5832a3b3dc5" >
+		<http:listener doc:name="Listener" doc:id="3fc3561f-1c4a-4f36-94dd-7c4f56cbd493" config-ref="HTTP_Listener_config" path="/scatterGather2" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="fab23802-d540-46db-89a5-74390c834768" >
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="ee3f90f2-5f5f-4c06-8764-2f2957936ee4" name="ScatterGatherSub_input1" />
+			</route>
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="f4138fc2-1059-4b73-8d80-1b47a8506c8c" name="ScatterGatherSub_input1" />
+			</route>
+			<route >
+				<flow-ref doc:name="ScatterGatherSub_input1" doc:id="f84d909b-c698-4119-8a1e-3407052bcf2f" name="ScatterGatherSub_input1" />
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="af89250a-6053-4361-9588-5a18065795f5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	users: payload..payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

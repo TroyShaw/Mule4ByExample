@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="xml_payload" format="xml">
+      <types:example format="xml" element="order" location="examples/xml_input.xml"/>
+    </types:type>
+    <types:type name="csvInputJson" format="json">
+      <types:example format="json" location="examples/csvMappingInput.json"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#f95c1176-907a-41f5-9d57-5531c3f35ef9">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="xml_payload"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5b60324d-8162-4d55-a20f-82c4be8fd211">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="xml_payload"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b8897a10-41c8-4579-8a4d-9764aa602aa5">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="csvInputJson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

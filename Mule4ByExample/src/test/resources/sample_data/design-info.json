@@ -1,0 +1,36 @@
+{
+  "sampleData": {
+    "2cdbc38d-5ce7-4efd-a1d8-b2bff59836fb": {
+      "payload": "sample_data/_3.dwl"
+    },
+    "618ea829-afdd-49bc-bde5-7b11135683e3": {
+      "payload": "sample_data/unknown_7.dwl"
+    },
+    "5588568b-bbb5-4177-b8d4-5d2aab4fe58a": {
+      "payload": "sample_data/unknown_2.dwl"
+    },
+    "aa96735a-4a4d-4105-910a-75f250d8a712": {
+      "payload": "sample_data/unknown_1.dwl"
+    },
+    "ae8266b4-4530-4ae4-9c18-d7daa4c39b59": {
+      "payload": "sample_data/.dwl"
+    },
+    "5b60324d-8162-4d55-a20f-82c4be8fd211": {
+      "payload": "sample_data/unknown.dwl"
+    },
+    "aa1e7dd6-f2a0-4e08-88d0-171c34ba2417": {
+      "vars-degreeType": "sample_data/unknown_5.dwl",
+      "vars-age": "sample_data/unknown_6.dwl",
+      "payload": "sample_data/_2.dwl"
+    },
+    "af89250a-6053-4361-9588-5a18065795f5": {
+      "payload": "sample_data/_1.dwl"
+    },
+    "391454c3-b5dd-4ff8-8318-202a18c0abee": {
+      "payload": "sample_data/unknown_3.dwl"
+    },
+    "ccdea565-af48-4bea-8585-0f2619a95683": {
+      "payload": "sample_data/unknown_4.dwl"
+    }
+  }
+}

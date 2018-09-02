@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="testFlowPrintHttpParams" doc:id="8a487f69-693a-43aa-88f9-9745e820b6f2" >
+		<http:listener doc:name="Listener" doc:id="9f338bf2-8524-4c27-ba78-dab8b444049c" config-ref="HTTP_Listener_config" path="/test" />
+		<logger level="INFO" doc:name="Log Headers" doc:id="ce8c198f-8581-475f-a2eb-747ffa662dae" message="header1=#[message.attributes.headers['header1']]" />
+		<logger level="INFO" doc:name="Logger" doc:id="e5f004fc-9bef-4370-ac61-c94fe0e3fb39" message="logHttpParam httpParam1=#[message.attributes.queryParams['httpParam1']]" />
+		<choice doc:name="Choice" doc:id="d88476bf-62fe-481b-983a-afe4f5d6ae3c" >
+			<when expression="#[message.attributes.headers['specialMode'] == 'InSpecialMode']" >
+				<logger level="INFO" doc:name="Logger" doc:id="54955e86-ca5e-4898-b4c2-e84bf001b1a2" message="log special mode" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="e9ed1026-4d1f-4ced-a5f0-5732d8133438" message="Log Default" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="testFlowInternalHttpParam" doc:id="a774ceaf-33d5-4ec8-a532-bd4a2ff6e3a0" >
+		<http:listener doc:name="Listener" doc:id="5dc57a9c-0a62-49ff-b241-230559981f4c" config-ref="HTTP_Listener_config" path="/test/{id}" />
+		<logger level="INFO" doc:name="Logger" doc:id="691c63c9-e2a3-423c-be23-1ff6b1316ae6" message="uriParameter: id=#[attributes.uriParams.id]" />
+	</flow>
+</mule>

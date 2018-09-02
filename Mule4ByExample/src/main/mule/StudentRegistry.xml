@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<flow name="StudentRegistryFlow" doc:id="42119848-0c5f-48a3-b1cd-bfe2530a6a0e" >
+		<http:listener doc:name="Listener" doc:id="506f25b1-5ed2-4b3b-8f2c-c88b24ed97fd" config-ref="HTTP_Listener_config" path="/students">
+			<http:error-response statusCode="#[attributes['http.status']]">
+				<http:body ><![CDATA[#[output text/json --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-variable value="#[message.attributes.headers.degreeType default '']" doc:name="degreeType" doc:id="610787dc-17be-44cf-bc85-789a9bd21516" variableName="degreeType"/>
+		<set-variable value="#[message.attributes.headers.age default '']" doc:name="age" doc:id="47d20074-b1b0-4542-b22a-38cb563e9e9a" variableName="age"/>
+		<choice doc:name="Choice" doc:id="82ab32c0-faaf-4a86-afed-5932415b7237" >
+			<when expression="#[vars.age != '']" >
+				<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="4254e4ef-153c-4578-ac24-0ff1efbf5e10" value="#[vars.age]">
+			<error-mapping sourceType="VALIDATION:INVALID_NUMBER" targetType="APP:INVALID_AGE" />
+		</validation:is-number>
+			</when>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="75e1f50e-df02-486e-a9cd-69c9927d1d90" message="Searching for students with: degreeType=#[vars.degreeType], age=#[vars.age]"/>
+		<flow-ref doc:name="studentRegistryLookup" doc:id="b2a54efd-45fc-4b53-a68b-e98fbec8b985" name="studentRegistryLookup"/>
+		<ee:transform doc:name="Transform Message" doc:id="aa1e7dd6-f2a0-4e08-88d0-171c34ba2417" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+fun filterByDegree(students, degreeType) = 
+	if (degreeType != "")
+		students filter ($.degree == degreeType)
+	else students
+
+fun filterByAge(students, age) = 
+	if (age != "")
+		students filter (($.age as String) == age)
+	else students
+
+---
+filterByDegree(
+filterByAge(payload.students, vars.age),
+vars.degreeType)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="aecb2c18-f4b3-4921-92ac-b83a12ddd3d7" type="APP:INVALID_AGE">
+				<ee:transform doc:name="Transform Message" doc:id="3843ecf4-eec1-4067-90d7-35b1811e1373" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: "invalid age parameter"
+}]]></ee:set-payload>
+						<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"http.status": 400
+}]]></ee:set-attributes>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1286222e-9f59-4bde-b1ed-d7dd45f313b4" >
+				<ee:transform doc:name="Transform Message" doc:id="ffffcd2a-3472-4375-b6bf-79e6bc103521" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: "unknown error"
+}]]></ee:set-payload>
+						<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"http.status": 500
+}]]></ee:set-attributes>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<sub-flow name="studentRegistryLookup" doc:id="2088b8c7-4ddc-4f8f-8105-0c4f7fedf56d" >
+		<set-payload doc:name="Set Payload" doc:id="cc1cf028-1536-4f4e-9d03-f54181e36a44" value='#[
+{
+   "students":[
+      {
+         "name":"John Smith",
+         "degree":"Software Engineering",
+         "age":21
+      },
+      {
+         "name":"Samantha Bell",
+         "degree":"Software Engineering",
+         "age":25
+      },
+      {
+         "name":"Holly Badger",
+         "degree":"Criminology",
+         "age":21
+      },
+      {
+         "name":"Steven Bedington",
+         "degree":"Political Science",
+         "age":19
+      },
+      {
+         "name":"George Elliot",
+         "degree":"Philosophy",
+         "age":45
+      }
+   ]
+}
+]'/>
+	</sub-flow>
+</mule>

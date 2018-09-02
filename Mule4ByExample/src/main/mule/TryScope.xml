@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="TryScopeFlowSuccess" doc:id="8208d4bf-dad6-4828-9041-6f04567735e2" >
+		<http:listener doc:name="Listener" doc:id="a8d9678f-3277-4eee-b363-18ba534a5383" config-ref="HTTP_Listener_config" path="/tryScopeFlow"/>
+		<try doc:name="Try" doc:id="9e55d0a7-ffd0-45a2-92b6-544666004f4c" >
+			<ee:transform doc:name="Transform Message" doc:id="c56fb7c5-6cb0-469d-87f7-a03379f73bfa" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	wasSuccess: true
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8cecff79-3091-48c4-9be6-ff68642dec4e" >
+					<logger level="INFO" doc:name="Logger" doc:id="ae3ded72-fe5f-4510-9d88-df3d8126994c" message="Error occured"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</flow>
+</mule>
