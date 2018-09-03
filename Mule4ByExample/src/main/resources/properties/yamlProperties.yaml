@@ -1,0 +1,8 @@
+http:
+  port: "8081"
+  path: "localhost"
+
+yaml:
+  property:
+    val: "this is the YAML property"
+    toPrint: "I want to print this"

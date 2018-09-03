@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<!-- 
+		In this configuration file we:
+			- Load properties using the <configuration-properties> XML element
+			- Show loading of multiple properties
+			- Show loading of YAML as well as traditional properties files
+	
+		We also use properties in various ways:
+			- Use of properties in logging with ${property.value.name}
+			- Use in DataWeave with the p('property.value.name') function
+			- Use in configuration of Mule connectors using ${property.value.name}
+			
+		TODO: use encrypted properties.
+	 -->
+	
+	<!-- One can reference files using the configuration-properties element. -->
+	<!-- You can use multiple property elements, and Mule will load these in the order you specify. -->
+	<!-- If a property is duplicated in multiple files, only the first will be used. Others will be ignored. -->
+	
+	<!-- The following two properties are located in the Mule project on the class-path. These are packaged with the application at build-time. -->
+	<configuration-properties doc:name="Configuration properties" doc:id="3f09693f-b308-4a99-8a22-32203104159c" file="properties/yamlProperties.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="7289fd3f-d362-4e01-8daa-38e847c928c3" file="properties/traditionalProperties.properties" />
+	
+	<!-- This property is located on the drive where the Mule application is deployed. -->
+	<!-- This can be used to externalise properties for environment specific properties (e.g. properties in test vs prod environments). -->
+	<!-- <configuration-properties doc:name="Configuration properties" doc:id="aa539e8d-f677-4a08-a004-312db30675c2" file="/opt/mule/properties/serverProperties.properties" /> -->
+	
+	<flow name="GetYamlProperty" doc:id="c8922851-932c-464f-aa1c-2e0822d70e05" >
+		<http:listener doc:name="Listener" doc:id="28dc8760-c1f5-4494-b7c7-bfe5d87505c9" config-ref="HTTP_Listener_config" path="/getYamlProperty"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f9881558-2170-4d6b-85d2-cd0a00f2f9f6" message="You can print properties like so: ${yaml.property.toPrint}"/>
+		<ee:transform doc:name="Transform Message" doc:id="fe36079f-4b48-4fa3-9869-782011a3dc6c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+yamlProperty: p("yaml.property.val")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetTraditionalProperty" doc:id="4a0e07ce-d9cc-44b0-a42e-aaf057f7efd8" >
+		<http:listener doc:name="Listener" doc:id="d1eeb00b-7803-4012-a532-18031d14e8e3" path="/getTraditionalProperty" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="27e3d468-0370-4c7c-a22f-05627c1d1334" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+traditionalproperty: p("traditional.property.val")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+</mule>

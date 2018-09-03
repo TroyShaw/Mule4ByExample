@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<!-- 
+		In this configuration file we:
+			- Show use of XML Schema validation
+			- Show use of XSLT Transformation
+			- Show use of XPath execution
+			
+		TODO: XSLT, XPath
+	 -->
+	
+	<flow name="XmlSchemaValidation" doc:id="d32087fe-47eb-41a8-a1e4-851f4f5564aa" doc:description='Allows a user to pass in an XML body. The Mule flow then validates this against an XSD Schema.
+
+If the XML matches, a JSON body is returned:
+{
+"isValid": true
+}
+
+If the XML does not match, a JSON body is returned:
+{
+"isValid": false}
+'>
+		<http:listener doc:name="Listener" doc:id="c297b211-e452-4bb0-a014-452b10b92406" config-ref="HTTP_Listener_config" path="/xmlValidateSchema"/>
+		<try doc:name="Try" doc:id="91d3f63f-2087-4bb7-be39-4fd332a00b35" >
+			<xml-module:validate-schema doc:name="Validate schema" doc:id="6cbb9b60-e074-4e37-bb70-cf6b80f1955f" schemas="XmlModule/shipOrder.xsd">
+			<error-mapping sourceType="XML-MODULE:INVALID_INPUT_XML" targetType="APP:INVALID_XML" />
+				<error-mapping sourceType="XML-MODULE:SCHEMA_NOT_HONOURED" targetType="APP:INVALID_XML" />
+		</xml-module:validate-schema>
+			<set-payload value="#[true]" doc:name="Set Payload" doc:id="5f10e61f-9525-479a-ac68-91acb7d6135e" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1d85a5c5-bf14-47f1-a183-0c6fdd78e3dd" type="APP:INVALID_XML">
+					<set-payload value="#[false]" doc:name="Set Payload" doc:id="423b9f83-bf11-4805-bef3-7e3e025d9c68" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="5d25106c-ed17-4f7e-8541-b8c5fa602f82" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+isValid: payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
