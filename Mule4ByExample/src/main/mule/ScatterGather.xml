@@ -5,6 +5,13 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<!-- 
+		In this configuration file we:
+			- Show use of scatter-gather
+			- Show joining of scatter-gather results using DataWeave
+	 -->
+	
 	<flow name="ScatterGatherFlattenResults1" doc:id="c3691ae8-aaf5-49f9-9a60-dc9670fd381f" >
 		<http:listener doc:name="Listener" doc:id="c489833b-1f25-4b97-8e5c-bb69bad7e258" config-ref="HTTP_Listener_config" path="/scatterGather1"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="16a14bdc-9742-478d-b61a-a8f566b80b3a" >

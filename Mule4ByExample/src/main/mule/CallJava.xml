@@ -8,6 +8,15 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<!-- 
+		In this configuration file we:
+			- Show how to create Spring beans which allow us to create object instances
+			- Call methods on our bean objects
+			- Call methods on static methods in Java
+			- Call complex methods involving parsing of JSON
+	 -->
+	
 	<java:config name="Java_Config" doc:name="Java Config" doc:id="be3058e8-97c3-4652-b4c4-242ac5b2fcb0" />
 	<object doc:name="Object" doc:id="cc6638ea-f8de-4bda-aa1f-55e3fcb440dc" name="myTransformer" class="nz.co.troyshaw.mule.MyTransformerClass" />
 	<object doc:name="Object" doc:id="714ec38b-4d4c-4946-b5e5-1803c6b168f9" name="jsonProcessor" class="nz.co.troyshaw.mule.JsonProcessor" />
