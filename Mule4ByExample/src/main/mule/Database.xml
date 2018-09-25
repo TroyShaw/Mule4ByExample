@@ -1,14 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
 	<!-- 
 		In this configuration file we:
-			- Show use of Database connector
+			- Show use of Database Config, to connect to a database
+			- Selection of all elements from a DB
+			- Use of populating parameters via HTTP input, and use of this via dataweave
 			
-		TODO: nothing here yet
 	 -->
-
+	
+	
+	<!-- This is a singleton bean object. This bean constructs our H2 database and populates it with data. -->
+	<object doc:name="Object" doc:id="1ad08687-3c5d-47cc-802a-2b4211c40ca6" name="H2Database" class="nz.co.troyshaw.mule.h2.H2DatabasePopulator" />
+	
+	<!-- 
+		This is the configuration to interact with our H2 database. 
+		Please note ordinarily this would be defined in Transports.xml (the global file), however we do it here for demonstration purposes.
+		Please define your database configs in your global file in your own code.
+	-->
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="8d6c15e7-09bc-431b-beaa-ddc048150ab2" >
+		<db:generic-connection url="jdbc:h2:mem:test.db;USER=sa;PASSWORD=YOURNEWPASSWORD;DB_CLOSE_DELAY=-1" driverClassName="org.h2.Driver"/>
+	</db:config>
+	
+	<flow name="SelectUsers" doc:id="67b9b085-deee-401d-86f7-bc97dd5bb49b" >
+		<http:listener doc:name="Listener" doc:id="bc6aff2e-38a4-43ae-bc46-14531d378b58" config-ref="HTTP_Listener_config" path="/databaseSelectUsers"/>
+		<db:select doc:name="Select" doc:id="8e913f56-dbd5-439c-8fd1-c6f2ecfe77c3" config-ref="Database_Config">
+			<db:sql >SELECT * FROM WORKERS</db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="e1fc3a9d-10c7-46c7-8be3-228f38f72559" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DatabaseFlow" doc:id="b9cd1325-cd5a-45cd-a821-293479c1ab4d" >
+		<http:listener doc:name="Listener" doc:id="b195e543-26a5-49c8-8244-a487401aeca6" config-ref="HTTP_Listener_config" path="/databaseSelectUsersByFirstname"/>
+		<db:select doc:name="Select" doc:id="b771b798-810b-41c3-8aa8-d54f2611f423" config-ref="Database_Config" >
+			<db:sql >SELECT * FROM WORKERS WHERE firstname = :firstnameParam</db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'firstnameParam': payload
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0e0af2be-1fa4-43ba-b435-ea9a8ef97e26" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
 </mule>
